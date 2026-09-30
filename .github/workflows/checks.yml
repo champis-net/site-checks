@@ -2,7 +2,7 @@ name: Surveillance des sites
 
 on:
   schedule:
-    # Every 30 minutes, off the hour (GitHub delays runs at :00 the most).
+    # Every 30 minutes, at :07 and :37 - off the hour, which GitHub delays the most.
     - cron: '7,37 * * * *'
   workflow_dispatch:
 

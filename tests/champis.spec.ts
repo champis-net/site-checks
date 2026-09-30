@@ -57,6 +57,19 @@ test.describe(hostOf(champis.url), () => {
     expect(response.headers()['content-type']).toMatch(/^image\//);
   });
 
+  test('anciennes adresses phpBB : redirigent vers le forum', async ({ request }) => {
+    for (const { from, to } of champis.legacyRedirects) {
+      const response = await request.get(from, { maxRedirects: 0 });
+      const location = response.headers()['location'] ?? '';
+      expect(response.status(), `${from} répond ${response.status()} au lieu d'une redirection 301`).toBe(301);
+      expect(new URL(location, champis.url).pathname, `${from} redirige vers ${location}`).toMatch(to);
+    }
+
+    // And the topic it lands on is really there.
+    const topic = await request.get(champis.legacyRedirects[0].from);
+    expect(topic.status(), `${champis.legacyRedirects[0].from} aboutit sur ${topic.url()} (${topic.status()})`).toBe(200);
+  });
+
   test('certificat HTTPS : valable encore au moins 14 jours', async () => {
     test.skip(origin.endsWith('.ddev.site'), 'certificat local');
     await expectValidCertificate(hostOf(champis.url));

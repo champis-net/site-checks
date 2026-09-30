@@ -5,8 +5,7 @@
 
 // The Flarum forum: champis.dev (test site, password-protected) until the
 // launch, then champis.net - set the repository variable CHAMPIS_URL then
-// (Settings > Secrets and variables > Actions > Variables) and delete
-// tests/champis-phpbb.spec.ts.
+// (Settings > Secrets and variables > Actions > Variables).
 export const champis = {
   url: process.env.CHAMPIS_URL || 'https://champis.dev',
   // "user:password" of champis.dev's .htaccess (secret CHAMPIS_HTTP_AUTH);
@@ -15,13 +14,18 @@ export const champis = {
   // A frequently determined species, for the species pages.
   species: { id: 2525710, name: 'Hygrophoropsis aurantiaca' },
   searchTerm: 'bolet',
-};
-
-// The phpBB site still in production, and its determination keys
-// (keys.champis.net, which the migration to Flarum also downloads).
-export const champisPhpbb = {
-  url: 'https://champis.net',
-  keyFile: 'https://keys.champis.net/Fungi/Basidiomycota/Agaricaceae/Agaricus_La%20Chiusa_IT_NC.cle',
+  // Old phpBB addresses still linked from other sites, bookmarks and search
+  // engines (champis-forum's Legacy*RedirectController), and the path each
+  // must 301 to. Public content only: topic 22457 "Définition" in forum 62
+  // (Articles), 215533 one of its posts, 65978 a public attachment.
+  legacyRedirects: [
+    { from: '/viewtopic.php?t=22457', to: /^\/d\/1022457(-|$)/ },
+    { from: '/viewtopic.php?f=62&t=22457', to: /^\/d\/1022457(-|$)/ },
+    { from: '/viewtopic.php?p=215533', to: /^\/d\/1022457(-|\/|$)/ },
+    { from: '/viewforum.php?f=62', to: /^\/t\/articles$/ },
+    { from: '/download/file.php?id=65978', to: /^\/assets\/files\/./ },
+    { from: '/index.php', to: /^\/$/ },
+  ],
 };
 
 // The photo recognition service (champis-recognition).

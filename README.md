@@ -10,8 +10,7 @@ la panne change, puis fermée toute seule au retour.
 
 | Site | Tests |
 |---|---|
-| champis.dev (bientôt champis.net), le forum Flarum | l'accueil s'affiche avec les dernières discussions, sans erreur JavaScript ; la discussion la plus récente s'ouvre avec ses messages ; la recherche trouve des discussions ; une fiche espèce s'affiche ; une photo envoyée s'affiche |
-| champis.net (phpBB), jusqu'à la mise en production | l'accueil affiche les derniers sujets ; un fichier de clé se télécharge depuis keys.champis.net |
+| champis.dev (bientôt champis.net), le forum Flarum | l'accueil s'affiche avec les dernières discussions, sans erreur JavaScript ; la discussion la plus récente s'ouvre avec ses messages ; la recherche trouve des discussions ; une fiche espèce s'affiche ; une photo envoyée s'affiche ; les anciennes adresses phpBB (`viewtopic.php`, `viewforum.php`, `download/file.php`, `index.php`) redirigent en 301 vers la bonne page (liste dans `sites.ts`, `legacyRedirects`) |
 | ia.champis.net | le service de reconnaissance est prêt (`/health`) |
 | smajoie.ch, mycotra.org, champignons-geneve.ch | l'accueil s'affiche, sans message d'erreur WordPress ; `/wp-json/` répond avec le nom du site |
 
@@ -37,12 +36,12 @@ Les passages planifiés de GitHub peuvent avoir quelques minutes de retard.
 
 ## À la mise en production de Flarum
 
-- Settings > Secrets and variables > Actions > Variables : `CHAMPIS_URL` =
-  `https://champis.net`, puis supprimer le secret `CHAMPIS_HTTP_AUTH` ;
-- supprimer `tests/champis-phpbb.spec.ts`.
-
-L'issue ouverte, s'il y en a une, pour un site qui n'est plus testé se ferme
-toute seule au passage suivant.
+Settings > Secrets and variables > Actions > Variables : `CHAMPIS_URL` =
+`https://champis.net`, puis supprimer le secret `CHAMPIS_HTTP_AUTH`. Les
+tests passent alors de champis.dev à champis.net (une nouvelle issue
+« Panne : champis.net » en cas de problème) ; l'issue encore ouverte, s'il y
+en a une, pour un site qui n'est plus testé se ferme toute seule au passage
+suivant.
 
 ## Ajouter un site
 
