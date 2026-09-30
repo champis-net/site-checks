@@ -1,0 +1,17 @@
+{
+  "name": "site-checks",
+  "private": true,
+  "description": "Surveillance de champis.net et des sites des sociétés mycologiques",
+  "type": "commonjs",
+  "scripts": {
+    "test": "playwright test",
+    "alert": "node scripts/alert.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^24.19.0"
+  }
+}

@@ -1,0 +1,72 @@
+name: Surveillance des sites
+
+on:
+  schedule:
+    # Every 30 minutes, off the hour (GitHub delays runs at :00 the most).
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write # scripts/alert.mjs opens and closes the "panne" issues
+  actions: write # keepalive step below
+
+concurrency:
+  group: checks
+  cancel-in-progress: false
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Cache Playwright browser
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - run: npx playwright install --with-deps --only-shell chromium
+
+      # A failing site doesn't fail the run: it's reported through the
+      # issues (next step), so GitHub doesn't also mail every 30 minutes.
+      - name: Tests
+        id: tests
+        continue-on-error: true
+        run: npx playwright test
+        env:
+          CHAMPIS_URL: ${{ vars.CHAMPIS_URL }}
+          CHAMPIS_HTTP_AUTH: ${{ secrets.CHAMPIS_HTTP_AUTH }}
+
+      - name: Issues
+        if: ${{ !cancelled() }}
+        run: node scripts/alert.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Report (screenshots, traces)
+        if: ${{ steps.tests.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport
+          path: results/
+          retention-days: 14
+
+      # GitHub pauses the scheduled workflows of a public repository after
+      # 60 days without activity. Re-enabling the (already enabled) workflow
+      # resets that countdown, so the checks never stop on their own.
+      - name: Keepalive
+        if: ${{ github.event_name == 'schedule' }}
+        continue-on-error: true
+        run: gh api --method PUT "repos/${{ github.repository }}/actions/workflows/checks.yml/enable"
+        env:
+          GH_TOKEN: ${{ github.token }}
